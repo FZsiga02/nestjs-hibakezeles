@@ -21,7 +21,7 @@ export class AppController {
 
   @Post('/register')
   
-  register(@Body() registerDto: RegisterDto) {
+  async register(@Body() registerDto: RegisterDto) {
     if (
       !registerDto.email || 
       !registerDto.password || 
@@ -42,8 +42,8 @@ export class AppController {
     const userRepo = this.dataSource.getRepository(User);
     const user = new User();
     user.email = registerDto.email;
-    user.password = bcrypt.hash()
-    //userRepo.save()
+    user.password = await bcrypt.hash(registerDto.password, 15)
+    await userRepo.save(user)
 
     //DB-be beszúrás
     const newUser = {
