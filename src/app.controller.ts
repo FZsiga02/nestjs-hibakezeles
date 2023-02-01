@@ -22,5 +22,11 @@ export class AppController {
     if (!registerDto.email.includes('@')) {
       throw new BadRequestException('Email must contain a @ character');
     }
+    if (registerDto.password != registerDto.passwordAgain) {
+      throw new BadRequestException('The two passwords must match')
+    }
+    if (registerDto.password.length < 8) {
+      throw new BadRequestException('The password must be at least 8 characters long')
+    }
   }
 }
