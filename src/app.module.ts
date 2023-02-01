@@ -10,7 +10,7 @@ import { AppService } from './app.service';
       host: 'localhost',
       username: 'root',
       password: '',
-      database: 'database',
+      database: 'nestjs_hibakezeles',
       entities: [
         /* List of entities here */
       ],
