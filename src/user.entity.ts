@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { Url } from "url";
 
 @Entity()
 export default class User{
