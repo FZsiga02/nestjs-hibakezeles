@@ -15,7 +15,7 @@ export default class User{
   password: string;
 
   @Column()
-  profilePictureUrl: Url;
+  profilePictureUrl: string;
 
   @Column()
   registrationDate: Date;
