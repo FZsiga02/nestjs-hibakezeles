@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
-import { BadRequestException, Body, Controller, Get, Post, Render } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Render } from '@nestjs/common';
+import { ChangeStream, DataSource } from 'typeorm';
 import { AppService } from './app.service';
 import RegisterDto from './register.dto';
 import User from './user.entity';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
+import ChangeUserDto from './changeuser.dto';
 
 @Controller()
 export class AppController {
@@ -27,7 +28,7 @@ export class AppController {
       !registerDto.password || 
       !registerDto.passwordAgain
     ) {
-
+      throw new BadRequestException('Every parameters are mandatory')
     }
     if (!registerDto.email.includes('@')) {
       throw new BadRequestException('Email must contain a @ character');
@@ -45,10 +46,37 @@ export class AppController {
     user.password = await bcrypt.hash(registerDto.password, 15)
     await userRepo.save(user)
 
+    delete user.password;
+
     //DB-be beszúrás
     const newUser = {
       id: 34,
       email: 'email@example.com',
     };
+  }
+
+  @Patch('/users/:id')
+  async change(@Body() changeUserDto: ChangeUserDto, @Param('id') id: number) {
+    if (!changeUserDto.newEmail) {
+      throw new BadRequestException('The email address is mandatory')
+    }
+    if (!changeUserDto.newEmail.includes('@')) {
+      throw new BadRequestException('The new email address must contain a @ character');
+    }
+    if (changeUserDto.newPictureUrl) {
+      if (!changeUserDto.newPictureUrl.startsWith('http://') && !changeUserDto.newPictureUrl.startsWith('https://')) {
+        throw new BadRequestException('The URL of the new picture must start with http:// or https://')
+      }
+    }
+
+    const userRepo = this.dataSource.getRepository(User);
+    const user = await userRepo.findOneBy({ id: id })
+    user.email = changeUserDto.newEmail;
+    user.profilePictureUrl = changeUserDto.newPictureUrl;
+    await userRepo.save(user);
+
+    delete user.password;
+    
+    return user;
   }
 }
